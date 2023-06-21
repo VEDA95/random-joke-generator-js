@@ -16,7 +16,7 @@ export function raiseValueError(field: string, providedValue: any, correctValues
     }
 }
 
-export function rasieValueRangeError(field: string, providedRange: Array<any>, correctRange?: Array<any>, err?: any): void {
+export function raiseValueRangeError(field: string, providedRange: Array<any>, correctRange?: Array<any>, err?: any): void {
     let errMessage: string = correctRange != null && correctRange.length > 0 ?
         `The values for ${field} are invalid. Values provided were: ${providedRange.join(', ')}. Valid values include: ${correctRange?.join(', ')}` :
         `The value for ${field} is invalid. Value provided was: ${providedRange.join(', ')}.`;
@@ -31,7 +31,7 @@ export function rasieValueRangeError(field: string, providedRange: Array<any>, c
     }
 }
 
-export function rasieTypeError(field: string, valueType: string, correctType?: string, err?: any): void {
+export function raiseTypeError(field: string, valueType: string, correctType?: string, err?: any): void {
     let errMessage: string = correctType != null && correctType.length > 0 ?
         `The data type of the value for ${field} is invalid. The data type of the value provided is: ${valueType}. The valid data type for ${field} is ${correctType}` :
         `The data type of the value for ${field} is invalid. The data type of the value provided is: ${valueType}.`;
