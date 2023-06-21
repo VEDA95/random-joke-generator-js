@@ -1,4 +1,4 @@
-import { writeFileSync } from 'fs';
+import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import { resolve } from 'path';
 
 export interface IJSONErrorLog {
@@ -19,6 +19,10 @@ export function writeErrorToJSON(errMessage: string, errType: string, field?: st
 
 	if (field != null && field.length > 0) errBody = { ...errBody, field };
 	if (cause != null) errBody = { ...errBody, cause };
+
+    const errorsPath: string = resolve('./errors');
+
+    if(!existsSync(errorsPath)) mkdirSync(errorsPath);
 
 	writeFileSync(
 		resolve(
