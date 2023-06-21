@@ -22,7 +22,7 @@ export function writeErrorToJSON(errMessage: string, errType: string, field?: st
 
 	writeFileSync(
 		resolve(
-			`./random_joke_generator_error_${now.getFullYear()}${now.getMonth()}${now.getDay()}${now.getHours()}${now.getMinutes()}${now.getSeconds()}.json`
+			`./errors/random_joke_generator_error_${now.getFullYear()}${now.getMonth()}${now.getDay()}${now.getHours()}${now.getMinutes()}${now.getSeconds()}.json`
 		),
 		JSON.stringify(errBody)
 	);
