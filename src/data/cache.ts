@@ -12,13 +12,16 @@ export interface ICachedJoke extends IJokeResponse {
     date_fetched: Date;
 }
 
+export interface IJokeCache {
+    [index: number]: ICachedJoke;
+}
+
 export interface ICache {
     last_updated: Date;
     next_clear: Date | null;
-    jokes: {
-        [index: number]: ICachedJoke;
-    };
+    jokes: IJokeCache;
 }
+
 
 export function initCacheConfig(defaultState: boolean = true, maxAge: number | null = 86400): ICacheConfig {
     const cache_path: string = resolve('./cache_config.json');
@@ -40,22 +43,64 @@ export function initCacheConfig(defaultState: boolean = true, maxAge: number | n
     return default_config;
 }
 
-export function setCache(jokes: Array<IJokeResponse>, maxAge: number | null): ICache {}
+export function createJokeCache(jokes?: Array<ICachedJoke>): IJokeCache  {
+    if(!Array.isArray(jokes) || jokes.length === 0) return {};
+
+    let output: IJokeCache = {};
+    const now: Date = new Date();
+
+    for(let joke of jokes) {
+        output = {...output, [joke.id]: joke};
+    }
+
+    return output;
+}
+
+export function initCache(maxAge: number | null, jokes?: Array<ICachedJoke>): ICache {
+    const cache_path: string = resolve('./cache.json');
+    const now: Date = new Date();
+    const cache: ICache = {
+        last_updated: now,
+        next_clear: maxAge !== null ? new Date(now.setSeconds(now.getSeconds() + maxAge)) : maxAge,
+        jokes: jokes != null ? createJokeCache(jokes) : createJokeCache()
+    };
+
+    writeFileSync(cache_path, JSON.stringify(cache));
+    return cache;
+}
+
+export function setCache(jokes: Array<IJokeResponse>, maxAge: number | null): ICache {
+    const cache_path: string = resolve('./cache.json');
+    const now: Date = new Date();
+    const cached_jokes: Array<ICachedJoke> = jokes.map((joke: IJokeResponse) => ({...joke, date_fetched: now}));
+    let cache: ICache;
+
+    if(!existsSync(cache_path)) {
+        cache = initCache(maxAge, cached_jokes);
+
+    } else {
+        let json_cache: any;
+
+        try {
+            json_cache = JSON.parse(readFileSync(cache_path).toString());
+            
+        } catch(err: any) {
+            if(err != null) raiseCacheErr(err);
+        }
+
+        cache = {...json_cache as ICache, jokes: createJokeCache(cached_jokes)};
+    }
+
+    writeFileSync(cache_path, JSON.stringify(cache));
+
+    return cache;
+}
 
 export function fetchCache(maxAge: number | null,): ICache {
     const cache_path: string = resolve('./cache.json');
     const now: Date = new Date();
     
-    if(!existsSync(cache_path)) {
-        const cache: ICache = {
-            last_updated: now,
-            next_clear: maxAge !== null ? new Date(now.setSeconds(now.getSeconds() + maxAge)) : maxAge,
-            jokes: {}
-        };
-
-        writeFileSync(cache_path, JSON.stringify(cache));
-        return cache;
-    }
+    if(!existsSync(cache_path)) return initCache(maxAge);
 
     let readCache: ICache | undefined;
 
