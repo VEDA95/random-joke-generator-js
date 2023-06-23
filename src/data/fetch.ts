@@ -1,4 +1,6 @@
-import {getRandomCategory, getRandomId} from './random';
+import {getRandomCategory} from './random';
+import {throwGenericError} from '../error/throw';
+import {writeErrorToJSON} from '../error/save';
 
 export interface IJokeResponse {
     error: boolean;
@@ -19,14 +21,17 @@ export interface IJokeResponse {
     };
 };
 
-export default async function fetchJokeData(category?: string, flags?: Array<string>, type?: string, query?: string, ids?: Array<number>, amount?: number, language?: string): Promise<IJokeResponse> {
+export default async function fetchJokeData(ids: Array<number>, category?: string, flags?: Array<string>, type?: string, query?: string, amount?: number, language?: string): Promise<IJokeResponse> {
     let url: string = `https://v2.jokeapi.dev/joke/${category != null && category.length > 0 ? category : getRandomCategory()}?`;
     let json_body: any;
 
-    if(ids != null && ids.length > 0) {
+    if(ids.length > 0) {
         url += ids.length > 1 ? `idRange=${ids[0] === ids[1] ? ids[0] : ids.join('-')}` : `idRange=${ids[0]}`;
     } else {
-        url += `idRange=${getRandomId()}`;
+        const errMessage: string = 'No Id was provided for fetching a joke.';
+        
+        writeErrorToJSON(errMessage, 'Generic', null, 'ids');
+        throwGenericError(errMessage);
     }
     if(flags != null && flags.length > 0) url += `&blacklistFlags=${flags.join(',')}`;
     if(type != null && type.length > 0) url += `&type=${type}`;
