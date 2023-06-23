@@ -1,6 +1,6 @@
 import {getRandomCategory, getRandomId} from './random';
 
-interface IJokeResponse {
+export interface IJokeResponse {
     error: boolean;
     category: 'Programming' | 'Misc' | 'Dark' | 'Pun' | 'Spooky' | 'Spooky' | 'Christmas';
     type: 'single' | 'twopart';
