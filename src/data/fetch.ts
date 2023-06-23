@@ -1,4 +1,5 @@
 import {getRandomCategory} from './random';
+import {raiseRequestErr} from '../error/data';
 import {throwGenericError} from '../error/throw';
 import {writeErrorToJSON} from '../error/save';
 
@@ -47,9 +48,13 @@ export default async function fetchJokeData(ids: Array<number>, category?: strin
                 'Content-Type': 'application/json'
             }
         });
+
+        if(!response.ok) raiseRequestErr(response, response.status);
+
         json_body = await response.json();
 
     } catch(err: any) {
+        if(err != null) raiseRequestErr(err);
     }
 
     return json_body as IJokeResponse;

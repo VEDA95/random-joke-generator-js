@@ -1,5 +1,6 @@
 import {existsSync, writeFileSync, readFileSync} from 'fs';
 import {resolve} from 'path';
+import {raiseCacheErr} from '../error/data';
 import type {IJokeResponse} from './fetch';
 
 export interface ICacheConfig {
@@ -30,7 +31,11 @@ export function initCacheConfig(defaultState: boolean = true, maxAge: number | n
 
     const default_config: ICacheConfig = {enabled: defaultState, maxAge: maxAge as number};
 
-    writeFileSync(cache_path, JSON.stringify(default_config));
+    try {
+        writeFileSync(cache_path, JSON.stringify(default_config));
+    } catch(err: any) {
+        if(err != null) raiseCacheErr(err);
+    }
 
     return default_config;
 }
@@ -58,7 +63,7 @@ export function fetchCache(maxAge: number | null,): ICache {
         readCache = JSON.parse(readFileSync(cache_path).toString());
 
     } catch(err: any) {
-        if(err != null) throw err;
+        if(err != null) raiseCacheErr(err);
     }
 
     if(readCache?.next_clear != null && now > readCache?.next_clear) {
