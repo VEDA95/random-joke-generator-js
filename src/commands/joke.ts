@@ -1,5 +1,6 @@
 import commander from 'commander';
 import {raiseValueError, raiseTypeError, raiseValueRangeError} from '../error/commands';
+import {throwGenericError} from '../error/throw';
 import type {Command} from 'commander';
 
 interface IJokeOptions {
@@ -47,10 +48,7 @@ const jokeCommand: Command = joke
             if(!areFlagValuesValid) raiseValueRangeError('flag', flag, validFlagValues);
         }
         if(Array.isArray(id)) {
-            if(id.length > 2) {
-                Error.stackTraceLimit = 0;
-                throw new Error('No more than two values for the field id are allowed...');
-            }
+            if(id.length > 2) throwGenericError('No more than two values for the field id are allowed...');
 
             let invalidIdTypes: Array<string> = [];
             const idArray = id as Array<string>;
