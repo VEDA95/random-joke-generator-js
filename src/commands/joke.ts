@@ -47,6 +47,11 @@ const jokeCommand: Command = joke
             if(!areFlagValuesValid) raiseValueRangeError('flag', flag, validFlagValues);
         }
         if(Array.isArray(id)) {
+            if(id.length > 2) {
+                Error.stackTraceLimit = 0;
+                throw new Error('No more than two values for the field id are allowed...');
+            }
+
             let invalidIdTypes: Array<string> = [];
             const idArray = id as Array<string>;
             const areIdValuesCorrectlyTyped: boolean = idArray.every((item: any) => {
@@ -59,7 +64,7 @@ const jokeCommand: Command = joke
                 }
             });
 
-            if(!areIdValuesCorrectlyTyped) raiseTypeError('flag', `Array<${invalidIdTypes.join(' | ')}>`, 'Array<number>');
+            if(!areIdValuesCorrectlyTyped) raiseTypeError('id', `Array<${invalidIdTypes.join(' | ')}>`, 'Array<number>');
         }
         if(valueTypeValue !== 'string') raiseTypeError('language', valueTypeValue, 'string');
         if(!validValueTypeValues.includes(type)) raiseValueError('type', type, validValueTypeValues);
